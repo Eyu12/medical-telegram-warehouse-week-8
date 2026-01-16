@@ -1,4 +1,7 @@
 data 
 .env
 .venv
-_pycache_/
+__pycache__
+telegram_scraper_session.session
+telegram_scraper_session.session-journal
+logs
