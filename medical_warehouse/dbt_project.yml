@@ -1,0 +1,10 @@
+name: medical_warehouse
+version: "1.0"
+profile: medical_warehouse
+
+models:
+  medical_warehouse:
+    staging:
+      materialized: view
+    marts:
+      materialized: table

@@ -1,0 +1,21 @@
+version: 2
+
+models:
+  - name: stg_telegram_messages
+    description: "Cleaned staging table for telegram messages"
+    columns:
+      - name: message_id
+        description: "Unique message identifier"
+        tests:
+          - unique
+          - not_null
+      - name: channel_id
+        description: "Telegram channel ID"
+        tests:
+          - not_null
+      - name: message_text
+        description: "Message content"
+        tests:
+          - not_null
+      - name: message_date
+        description: "Date the message was posted"
