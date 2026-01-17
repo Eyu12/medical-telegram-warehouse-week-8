@@ -1,0 +1,32 @@
+[
+  {
+    "message_id": 123456789,
+    "channel_id": 987654321,
+    "channel_username": "med_channel",
+    "channel_title": "Medical News",
+    "date": "2026-01-16T12:30:00",
+    "text": "New medicine approved for treatment of XYZ.",
+    "views": 120,
+    "forwards": 5,
+    "replies": 2,
+    "media_type": "photo",
+    "file_path": "data/raw/telegram_messages/2026-01-16/images/med1.jpg",
+    "url": "https://t.me/med_channel/123",
+    "scraped_at": "2026-01-16T14:00:00"
+  },
+  {
+    "message_id": 123456790,
+    "channel_id": 987654321,
+    "channel_username": "med_channel",
+    "channel_title": "Medical News",
+    "date": "2026-01-16T13:00:00",
+    "text": "Reminder: flu vaccination campaign starts tomorrow.",
+    "views": 85,
+    "forwards": 3,
+    "replies": 1,
+    "media_type": null,
+    "file_path": null,
+    "url": "https://t.me/med_channel/124",
+    "scraped_at": "2026-01-16T14:10:00"
+  }
+]
