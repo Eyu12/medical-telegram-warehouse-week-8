@@ -5,3 +5,4 @@ __pycache__
 telegram_scraper_session.session
 telegram_scraper_session.session-journal
 logs
+yolov8n.pt
