@@ -90,3 +90,118 @@ The workflow includes:
 - One row per message
 - Includes metrics: `view_count`, `forward_count`, `message_length`, `has_image`
 - Joins to `dim_channels` and `dim_dates` using surrogate keys
+
+# Task 3 - Data Enrichment with Object Detection (YOLO)
+
+**Objective:**  
+Use computer vision to analyze images and integrate the findings into your data warehouse.
+
+## Instructions
+
+1. **Set Up YOLO Environment**
+    pip install ultralytics
+- Use YOLOv8 nano (`yolov8n.pt`) for efficiency.
+
+2. **Implement Object Detection Script**
+- Create `src/yolo_detect.py` to:
+  - Scan images from Task 1
+  - Run YOLOv8 detection on each image
+  - Record detected objects and confidence scores
+  - Save results to CSV
+
+3. **Create Classification Scheme**
+- `promotional`: person + product  
+- `product_display`: bottle/container, no person  
+- `lifestyle`: person, no product  
+- `other`: neither detected
+
+4. **Integrate with Data Warehouse**
+- Create `models/marts/fct_image_detections.sql` dbt model
+  - Load YOLO results into PostgreSQL
+  - Join with `fct_messages` on `message_id`
+  - Include columns: `message_id`, `channel_key`, `date_key`, `detected_class`, `confidence_score`, `image_category`
+
+5. **Analyze Results**
+- Questions to answer in report:
+  - Do "promotional" posts get more views than "product_display" posts?
+  - Which channels use more visual content?
+  - Limitations of pre-trained models for domain-specific tasks
+
+## Deliverables
+- Object detection script (`src/yolo_detect.py`)
+- Detection results CSV
+- `fct_image_detections` dbt model
+- Analysis report
+
+# Task 4 - Build an Analytical API
+
+**Objective:**  
+Expose your data warehouse through a REST API for business analytics.
+
+## Instructions
+
+1. **Set Up FastAPI Project**
+pip install fastapi uvicorn
+- Create API structure in `api/`
+- Use SQLAlchemy for DB connections
+
+2. **Implement Analytical Endpoints**
+- **Top Products**
+GET /api/reports/top-products?limit=10
+- **Channel Activity**
+GET /api/channels/{channel_name}/activity
+- **Message Search**
+GET /api/search/messages?query=paracetamol&limit=20
+- **Visual Content Stats**
+GET /api/reports/visual-content
+
+3. **Add Data Validation**
+- Use Pydantic models (`api/schemas.py`)
+- Include error handling and HTTP status codes
+
+4. **Document the API**
+- FastAPI generates OpenAPI docs automatically
+- Access at `/docs`
+- Add descriptions for endpoints & parameters
+
+## Deliverables
+- FastAPI application (`api/main.py`)
+- 4+ analytical endpoints
+- Pydantic schemas
+- Screenshots of API docs and example responses
+
+
+# Task 5 - Pipeline Orchestration
+
+**Objective:**  
+Automate your data pipeline using Dagster.
+
+## Instructions
+
+1. **Install Dagster**
+pip install dagster dagster-webserver
+
+2. **Define Pipeline as Dagster Job**
+- Convert scripts into Dagster `ops`:
+  - `scrape_telegram_data`
+  - `load_raw_to_postgres`
+  - `run_dbt_transformations`
+  - `run_yolo_enrichment`
+
+3. **Create the Job Graph**
+- Define dependencies between ops
+- Ensure proper execution order
+
+4. **Launch and Test**
+dagster dev -f pipeline.py
+- Access UI: [http://localhost:3000](http://localhost:3000)
+- Run manually
+- Monitor logs & execution
+
+5. **Add Scheduling**
+- Configure daily pipeline runs
+- Set up alerts for failures
+
+## Deliverables
+- Dagster pipeline definition (`pipeline.py`)
+- Screenshots of successful runs in UI
