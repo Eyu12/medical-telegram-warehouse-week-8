@@ -1,0 +1,76 @@
+version: '3.8'
+
+services:
+  postgres:
+    image: postgres:15-alpine
+    container_name: medical_warehouse_postgres
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER:-medical_user}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-medical_pass}
+      POSTGRES_DB: ${POSTGRES_DB:-medical_warehouse}
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+      - ./init-db.sql:/docker-entrypoint-initdb.d/init-db.sql
+      - ./data/raw:/data/raw
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U medical_user"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    networks:
+      - medical-network
+
+  scraper:
+    build:
+      context: .
+      dockerfile: Dockerfile-task1
+    container_name: telegram_scraper
+    depends_on:
+      postgres:
+        condition: service_healthy
+    volumes:
+      - .:/app
+      - ./data:/app/data
+      - ./logs:/app/logs
+    environment:
+      - TELEGRAM_API_ID=${TELEGRAM_API_ID}
+      - TELEGRAM_API_HASH=${TELEGRAM_API_HASH}
+      - POSTGRES_HOST=postgres
+      - POSTGRES_PORT=5432
+      - POSTGRES_USER=${POSTGRES_USER:-medical_user}
+      - POSTGRES_PASSWORD=${POSTGRES_PASSWORD:-medical_pass}
+      - POSTGRES_DB=${POSTGRES_DB:-medical_warehouse}
+    command: python src/scraper.py
+    networks:
+      - medical-network
+
+  loader:
+    build:
+      context: .
+      dockerfile: Dockerfile-task1
+    container_name: data_loader
+    depends_on:
+      - postgres
+      - scraper
+    volumes:
+      - .:/app
+      - ./data:/app/data
+      - ./logs:/app/logs
+    environment:
+      - POSTGRES_HOST=postgres
+      - POSTGRES_PORT=5432
+      - POSTGRES_USER=${POSTGRES_USER:-medical_user}
+      - POSTGRES_PASSWORD=${POSTGRES_PASSWORD:-medical_pass}
+      - POSTGRES_DB=${POSTGRES_DB:-medical_warehouse}
+    command: python src/loader.py
+    networks:
+      - medical-network
+
+networks:
+  medical-network:
+    driver: bridge
+
+volumes:
+  postgres_data:
